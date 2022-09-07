@@ -91,7 +91,7 @@ char *_getenv(char *path_name);
 void index_cmd(sh_t *data);
 void array_rev(char *arr, int len);
 
-/* ----------More tools prototype--------*/
+/* ----------_atoi--------*/
 char *_itoa(unsigned int n);
 int intlen(int num);
 int _atoi(char *c);
