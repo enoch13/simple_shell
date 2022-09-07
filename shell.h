@@ -84,7 +84,7 @@ char *_memset(char *s, char byt, unsigned int n);
 char *_memcpy(char *dest, char *src, unsigned int n);
 int free_data(sh_t *);
 
-/* ----------Tools prototype-------------*/
+/* ----------env-shell prototype-------------*/
 void *fill_an_array(void *a, int el, unsigned int len);
 void signal_handler(int signo);
 char *_getenv(char *path_name);
