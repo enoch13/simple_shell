@@ -1,7 +1,6 @@
 #ifndef SHELL_H
 #define SHELL_H
 
-/* header files */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,7 +67,7 @@ int split_line(sh_t *);
 int parse_line(sh_t *);
 int process_cmd(sh_t *);
 
-/* ----------String prototype------------*/
+/* ----------exit prototype------------*/
 char *_strdup(char *str);
 char *_strcat(char *first, char *second);
 int _strlen(char *str);
