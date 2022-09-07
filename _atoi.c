@@ -1,74 +1,120 @@
 #include "shell.h"
 
 /**
- * interactive - returns true if shell is interactive mode
- * @info: struct address
+ * _itoa - convert integer to array
+ * @n: the given number
  *
- * Return: 1 if interactive mode, 0 otherwise
+ * Return: a pointer to the null terminated string
  */
-int interactive(info_t *info)
+char *_itoa(unsigned int n)
 {
-	return (isatty(STDIN_FILENO) && info->readfd <= 2);
+	int len = 0, i = 0;
+	char *s;
+
+	len = intlen(n);
+	s = malloc(len + 1);
+	if (!s)
+		return (NULL);
+	*s = '\0';
+	while (n / 10)
+	{
+		s[i] = (n % 10) + '0';
+		n /= 10;
+		i++;
+	}
+	s[i] = (n % 10) + '0';
+	array_rev(s, len);
+	s[i + 1] = '\0';
+	return (s);
+}
+/**
+ * _atoi - converts character to integer
+ * @c: the given character
+ *
+ * Return: An integer
+ */
+int _atoi(char *c)
+{
+	unsigned int val = 0;
+	int sign = 1;
+
+	if (c == NULL)
+		return (0);
+	while (*c)
+	{
+		if (*c == '-')
+			sign *= (-1);
+		else
+			val = (val * 10) + (*c - '0');
+		c++;
+	}
+	return (sign * val);
 }
 
 /**
- * is_delim - checks if character is a delimeter
- * @c: the char to check
- * @delim: the delimeter string
- * Return: 1 if true, 0 if false
+ * intlen - Determine the number of digit int integer
+ * @num: the given number
+ *
+ * Return: the length of the integer
  */
-int is_delim(char c, char *delim)
+int intlen(int num)
 {
-	while (*delim)
-		if (*delim++ == c)
-			return (1);
+	int len = 0;
+
+	while (num != 0)
+	{
+		len++;
+		num /= 10;
+	}
+	return (len);
+}
+/**
+ * print_error - prints error
+ * @data: the data structure pointer
+ *
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
+ */
+int print_error(sh_t *data)
+{
+	char *idx = _itoa(data->index);
+
+	PRINT("hsh: ");
+	PRINT(idx);
+	PRINT(": ");
+	PRINT(data->args[0]);
+	PRINT(": ");
+	PRINT(data->error_msg);
+	free(idx);
 	return (0);
 }
 
 /**
- *_isalpha - checks for alphabetic character
- *@c: The character to input
- *Return: 1 if c is alphabetic, 0 otherwise
+ * write_history - prints error
+ * @data: the data structure pointer
+ *
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
-
-int _isalpha(int c)
+int write_history(sh_t *data __attribute__((unused)))
 {
-	if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
-		return (1);
-	else
-		return (0);
-}
+	char *filename = "history";
+	char *line_of_history = "this is a line of history";
+	ssize_t fd, w;
+	int len;
 
-/**
- *_atoi - converts a string to an integer
- *@s: the string to be converted
- *Return: 0 if no numbers in string, converted number otherwise
- */
-
-int _atoi(char *s)
-{
-	int i, sign = 1, flag = 0, output;
-	unsigned int result = 0;
-
-	for (i = 0;  s[i] != '\0' && flag != 2; i++)
+	if (!filename)
+		return (-1);
+	fd = open(filename, O_RDWR | O_APPEND);
+	if (fd < 0)
+		return (-1);
+	if (line_of_history)
 	{
-		if (s[i] == '-')
-			sign *= -1;
-
-		if (s[i] >= '0' && s[i] <= '9')
-		{
-			flag = 1;
-			result *= 10;
-			result += (s[i] - '0');
-		}
-		else if (flag == 1)
-			flag = 2;
+		while (line_of_history[len])
+			len++;
+		w = write(fd, line_of_history, len);
+		if (w < 0)
+			return (-1);
 	}
-
-	if (sign == -1)
-		output = -result;
-	else
-		output = result;
-
-	return (output);
+	return (1);
 }
