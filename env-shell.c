@@ -1,92 +1,95 @@
 #include "shell.h"
-
 /**
- * _myenv - prints the current environment
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- * Return: Always 0
- */
-int _myenv(info_t *info)
-{
-	print_list_str(info->env);
-	return (0);
-}
-
-/**
- * _getenv - gets the value of an environ variable
- * @info: Structure containing potential arguments. Used to maintain
- * @name: env var name
+ * _getenv - gets the path
+ * @path_name: a pointer to the struct of data
  *
- * Return: the value
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
  */
-char *_getenv(info_t *info, const char *name)
+char *_getenv(char *path_name)
 {
-	list_t *node = info->env;
-	char *p;
+	char **environ_cursor, *env_ptr, *name_ptr;
 
-	while (node)
+	environ_cursor = environ;
+	while (*environ_cursor)
 	{
-		p = starts_with(node->str, name);
-		if (p && *p)
-			return (p);
-		node = node->next;
+		env_ptr = *environ_cursor;
+		name_ptr = path_name;
+		while (*env_ptr == *name_ptr)
+		{
+			if (*env_ptr == '=')
+				break;
+			env_ptr++;
+			name_ptr++;
+		}
+		if ((*env_ptr == '=') && (*name_ptr == '\0'))
+			return (env_ptr + 1);
+		environ_cursor++;
 	}
 	return (NULL);
 }
-
 /**
- * _mysetenv - Initialize a new environment variable,
- *             or modify an existing one
- * @info: Structure containing potential arguments. Used to maintain
- *        constant function prototype.
- *  Return: Always 0
+ * signal_handler - handle the process interrept signal
+ * @signo: the signal identifier
+ *
+ * Return: void
  */
-int _mysetenv(info_t *info)
+void signal_handler(int signo)
 {
-	if (info->argc != 3)
+	if (signo == SIGINT)
 	{
-		_eputs("Incorrect number of arguements\n");
-		return (1);
+		PRINT("\n");
+		PRINT(PROMPT);
 	}
-	if (_setenv(info, info->argv[1], info->argv[2]))
-		return (0);
-	return (1);
+}
+/**
+ * fill_an_array - fill an array with elements
+ * @a: the given array
+ * @el: the given element
+ * @len: the length of the array
+ *
+ * Return: pointer to filled array
+ */
+void *fill_an_array(void *a, int el, unsigned int len)
+{
+	char *p = a;
+	unsigned int i = 0;
+
+	while (i < len)
+	{
+		*p = el;
+		p++;
+		i++;
+	}
+	return (a);
 }
 
 /**
- * _myunsetenv - Remove an environment variable
- * @info: Structure containing potential arguments. Used to maintain
- *        constant function prototype.
- *  Return: Always 0
+ * array_rev - reverse array
+ * @arr: the given array
+ * @len: the array length
+ *
+ * Return: void
  */
-int _myunsetenv(info_t *info)
+void array_rev(char *arr, int len)
 {
 	int i;
+	char tmp;
 
-	if (info->argc == 1)
+	for (i = 0; i < (len / 2); i++)
 	{
-		_eputs("Too few arguements.\n");
-		return (1);
+		tmp = arr[i];
+		arr[i] = arr[(len - 1) - i];
+		arr[(len - 1) - i] = tmp;
 	}
-	for (i = 1; i <= info->argc; i++)
-		_unsetenv(info, info->argv[i]);
-
-	return (0);
 }
-
 /**
- * populate_env_list - populates env linked list
- * @info: Structure containing potential arguments. Used to maintain
- *          constant function prototype.
- * Return: Always 0
+ * index_cmd - indexed command
+ * @data: a pointer to the data structure
+ *
+ * Return: void
  */
-int populate_env_list(info_t *info)
+void index_cmd(sh_t *data)
 {
-	list_t *node = NULL;
-	size_t i;
-
-	for (i = 0; environ[i]; i++)
-		add_node_end(&node, environ[i], 0);
-	info->env = node;
-	return (0);
+	data->index += 1;
 }
