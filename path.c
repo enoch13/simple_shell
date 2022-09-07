@@ -1,74 +1,77 @@
 #include "shell.h"
-
 /**
- * clear_info - initializes info_t struct
- * @info: struct address
+ * is_path_form - chekc if the given fikenname is a path
+ * @data: the data strucct pointer
+ *
+ * Return: (Success)
+ * ------- (Fail) otherwise
  */
-void clear_info(info_t *info)
+int is_path_form(sh_t *data)
 {
-	info->arg = NULL;
-	info->argv = NULL;
-	info->path = NULL;
-	info->argc = 0;
+	if (_strchr(data->args[0], '/') != 0)
+	{
+		data->cmd = _strdup(data->args[0]);
+		return (SUCCESS);
+	}
+	return (FAIL);
 }
-
+#define DELIMITER ":"
 /**
- * set_info - initializes info_t struct
- * @info: struct address
- * @av: argument vector
+ * is_short_form - chekc if the given fikenname is short form
+ * @data: the data strucct pointer
+ *
+ * Return: (Success)
+ * ------- (Fail) otherwise
  */
-void set_info(info_t *info, char **av)
+void is_short_form(sh_t *data)
 {
+	char *path, *token, *_path;
+	struct stat st;
+	int exist_flag = 0;
+
+	path = _getenv("PATH");
+	_path = _strdup(path);
+	token = strtok(_path, DELIMITER);
+	while (token)
+	{
+		data->cmd = _strcat(token, data->args[0]);
+		if (stat(data->cmd, &st) == 0)
+		{
+			exist_flag += 1;
+			break;
+		}
+		free(data->cmd);
+		token = strtok(NULL, DELIMITER);
+	}
+	if (exist_flag == 0)
+	{
+		data->cmd = _strdup(data->args[0]);
+	}
+	free(_path);
+}
+#undef DELIMITER
+/**
+ * is_builtin - checks if the command is builtin
+ * @data: a pointer to the data structure
+ *
+ * Return: (Success) 0 is returned
+ * ------- (Fail) negative number will returned
+ */
+int is_builtin(sh_t *data)
+{
+	blt_t blt[] = {
+		{"exit", abort_prg},
+		{"cd", change_dir},
+		{"help", display_help},
+		{NULL, NULL}
+	};
 	int i = 0;
 
-	info->fname = av[0];
-	if (info->arg)
+	while ((blt + i)->cmd)
 	{
-		info->argv = strtow(info->arg, " \t");
-		if (!info->argv)
-		{
-
-			info->argv = malloc(sizeof(char *) * 2);
-			if (info->argv)
-			{
-				info->argv[0] = _strdup(info->arg);
-				info->argv[1] = NULL;
-			}
-		}
-		for (i = 0; info->argv && info->argv[i]; i++)
-			;
-		info->argc = i;
-
-		replace_alias(info);
-		replace_vars(info);
+		if (_strcmp(data->args[0], (blt + i)->cmd) == 0)
+			return (SUCCESS);
+		i++;
 	}
-}
-
-/**
- * free_info - frees info_t struct fields
- * @info: struct address
- * @all: true if freeing all fields
- */
-void free_info(info_t *info, int all)
-{
-	ffree(info->argv);
-	info->argv = NULL;
-	info->path = NULL;
-	if (all)
-	{
-		if (!info->cmd_buf)
-			free(info->arg);
-		if (info->env)
-			free_list(&(info->env));
-		if (info->history)
-			free_list(&(info->history));
-		if (info->alias)
-			free_list(&(info->alias));
-		ffree(info->environ);
-			info->environ = NULL;
-		bfree((void **)info->cmd_buf);
-		if (info->readfd > 2)
-			close(info->readfd);
-		_putchar(BUF_FLUSH);
-	}
+	return (NEUTRAL);
 }
