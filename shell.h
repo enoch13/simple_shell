@@ -74,7 +74,7 @@ int _strlen(char *str);
 char *_strchr(char *str, char c);
 int _strcmp(char *s1, char *s2);
 
-/* ----------More String prototype-------*/
+/* ----------String prototype-------*/
 char *_strcpy(char *dest, char *source);
 
 /* ----------Memory prototype------------*/
