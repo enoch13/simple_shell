@@ -1,74 +1,109 @@
 #include "shell.h"
 
 /**
- **_strncpy - copies a string
- *@dest: the destination string to be copied to
- *@src: the source string
- *@n: the amount of characters to be copied
- *Return: the concatenated string
+ * _strcat - concatenates two string in a path form
+ * @first: the first given destination
+ * @second: the second given source
+ *
+ * Return: (Success) to the newly string
+ * ------- (Fail) if it failed
  */
-char *_strncpy(char *dest, char *src, int n)
+char *_strcat(char *first, char *second)
 {
-	int i, j;
-	char *s = dest;
+	int len1, len2, i = 0, j = 0;
+	char *result;
 
-	i = 0;
-	while (src[i] != '\0' && i < n - 1)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	if (i < n)
-	{
-		j = i;
-		while (j < n)
-		{
-			dest[j] = '\0';
-			j++;
-		}
-	}
-	return (s);
-}
-
-/**
- **_strncat - concatenates two strings
- *@dest: the first string
- *@src: the second string
- *@n: the amount of bytes to be maximally used
- *Return: the concatenated string
- */
-char *_strncat(char *dest, char *src, int n)
-{
-	int i, j;
-	char *s = dest;
-
-	i = 0;
+	len1 = _strlen(first);
+	len2 = _strlen(second);
+	result = malloc((len1 + len2 + 2) * sizeof(char));
+	if (!result)
+		return (NULL);
+	*result = '\0';
+	while (first[j])
+		result[i++] = first[j++];
+	result[i++] = '/';
 	j = 0;
-	while (dest[i] != '\0')
-		i++;
-	while (src[j] != '\0' && j < n)
-	{
-		dest[i] = src[j];
-		i++;
-		j++;
-	}
-	if (j < n)
-		dest[i] = '\0';
-	return (s);
+	while (second[j])
+		result[i++] = second[j++];
+	result[i] = '\0';
+	return (result);
 }
-
 /**
- **_strchr - locates a character in a string
- *@s: the string to be parsed
- *@c: the character to look for
- *Return: (s) a pointer to the memory area s
+ * _strlen - finds the length of a given string
+ * @str: the given string
+ *
+ * Return: (Success) the length of the string
+ * ------- (Fail) negative value
  */
-char *_strchr(char *s, char c)
+int _strlen(char *str)
 {
-	do {
-		if (*s == c)
-			return (s);
-	} while (*s++ != '\0');
+	int len;
 
+	for (len = 0; str[len]; len++)
+		;
+	return (len);
+}
+/**
+ * _strcmp - compare two strings
+ * @s1: the first given string
+ * @s2: the second given string
+ *
+ * Return: (Success) a positive number
+ * ------- (Fail) a negative number
+ */
+int _strcmp(char *s1, char *s2)
+{
+	int cmp = 0, i;
+
+	if (s1 == NULL || s2 == NULL)
+		return (1);
+	for (i = 0; s1[i]; i++)
+	{
+		if (s1[i] != s2[i])
+		{
+			cmp = s1[i] - s2[i];
+			break;
+		}
+		else
+			continue;
+	}
+	return (cmp);
+}
+/**
+ * _strchr - locates a character in a given string
+ * @str: the given string
+ * @c: the given string
+ *
+ * Return: (Success) a pointer to the first occurence of c
+ * ------- (Fail) return a null pointer
+ */
+char *_strchr(char *str, char c)
+{
+	char *ptr;
+
+	if (str == NULL)
+		return (NULL);
+	for (ptr = str; *ptr; ptr++)
+		if (*ptr == c)
+			return (ptr);
 	return (NULL);
+}
+/**
+ * _strdup - dupicates string
+ * @str: the given string
+ *
+ * Return: (Success) a pointer to the duplicated string
+ * ------- (Fail) return a null pointer
+ */
+char *_strdup(char *str)
+{
+	char *dupl;
+
+	if (str == NULL)
+		return (NULL);
+	dupl = malloc(_strlen(str) + 1);
+	if (dupl == NULL)
+		return (NULL);
+	_strcpy(dupl, str);
+	return (dupl);
 }
